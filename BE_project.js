@@ -1,5 +1,10 @@
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser');
+const mongodb = require('mongodb');
+
+const dbConnect = mongodb.MongoClient.connect('mongodb://localhost:27017');
+
 const app = express();
 // รอcomment
 const port = process.env.PORT || 8080;
