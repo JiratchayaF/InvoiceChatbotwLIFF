@@ -1,17 +1,18 @@
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient
 // connect to DB
 // const dbConnect = mongodb.MongoClient.connect('mongodb://localhost:27017/ChatBotInvoiceTest');
 const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/'
 const app = express();
+
 // รอcomment
 const port = process.env.PORT || 8080;
+//
 
 app.use(express.json())
-// app.use(express.urlencoded());
-// app.use(bodyParser.urlencoded({extended: false}));
+
 // db connection
 MongoClient.connect(url, { 
     useNewUrlParser: true, 
@@ -41,3 +42,4 @@ app.get('/', function(req, res, next) {
 // รอcomment
 app.listen(port);
 console.log('Server started at http://localhost:' + port);
+//
