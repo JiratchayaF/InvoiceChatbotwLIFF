@@ -1,11 +1,10 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const mongodb = require('mongodb');
-const mongoose = require('mongoose');
+const MongoClient = require('mongodb').MongoClient
 // connect to DB
 // const dbConnect = mongodb.MongoClient.connect('mongodb://localhost:27017/ChatBotInvoiceTest');
-
+const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/'
 const app = express();
 // รอcomment
 const port = process.env.PORT || 8080;
@@ -14,17 +13,17 @@ app.use(express.json())
 // app.use(express.urlencoded());
 // app.use(bodyParser.urlencoded({extended: false}));
 // db connection
-mongoose.connect('mongodb://localhost:27017/mydb',{
-    useNewUrlParser:true,
-    useUnifiedTopology:true
-}, (err) => {
-    if(!err)
-    {
-        console.log("connected to db");
-    } else {
-        console.log("error");
-    }
-})
+MongoClient.connect(url, { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+    .then(client => {
+      console.log("Connected to MongoDB");
+      // Perform database operations here
+    })
+    .catch(err => {
+      console.log("Failed to connect to MongoDB:", err);
+    });
 
 app.post('/post-custmer-data', function(req,res){
     dbConnect.then(function(db) {
