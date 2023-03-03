@@ -37,13 +37,13 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/InvoiceChatbotwLIFF/LIFF/', function(req, res, next) {
+app.get('/', function(req, res, next) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
 });
 
-app.post('/', function(req,res){
+app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -51,7 +51,7 @@ app.post('/', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/InvoiceChatbotwLIFF/LIFF/") // redirect to main page
+    res.redirect("/") // redirect to main page
 }); 
 
 
