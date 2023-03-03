@@ -37,13 +37,13 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res) {
+app.get('/update-new', function(req, res) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
 });
 
-app.post('/updated-new', function(req,res){
+app.post('/update-new', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -51,7 +51,7 @@ app.post('/updated-new', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect(302, 'https://liff.line.me/1657898846-EryRWbgy'); // redirect to main page
+    res.redirect(302, '/update-new'); // redirect to main page
 }); 
 
 
