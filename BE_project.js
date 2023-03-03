@@ -43,7 +43,7 @@ app.get('/', function(req, res, next) {
 
 });
 
-app.post('updated-data', function(req,res){
+app.post('/updated-data', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
