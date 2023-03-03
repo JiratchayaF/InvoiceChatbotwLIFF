@@ -37,7 +37,7 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res, next) {
+app.get('/pages', function(req, res, next) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
@@ -51,7 +51,7 @@ app.post('/updated-data', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect(302,"/InvoiceChatbotwLIFF/LIFF/") // redirect to main page
+    res.redirect(req.get('/pages')); // redirect to main page
 }); 
 
 
