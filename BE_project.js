@@ -45,7 +45,7 @@ app.post('/post-custmer-data', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/post-custmer-data")
+    res.redirect("/InvoiceChatbotwLIFF/LIFF/")
 }); 
 
 app.get('/', function(req, res, next) {
