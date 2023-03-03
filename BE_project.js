@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const { redirect } = require('express/lib/response');
+// const { redirect } = require('express/lib/response');
 // connect to DB
 const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
 const app = express();
@@ -37,7 +37,7 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res, next) {
+app.get('/', function(req, res) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
@@ -51,7 +51,7 @@ app.post('/updated', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect(req.get('/')); // redirect to main page
+    res.redirect(302, 'https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/'); // redirect to main page
 }); 
 
 
