@@ -43,7 +43,7 @@ app.get('/', function(req, res, next) {
 
 });
 
-app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
+app.post('updated-data', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -51,7 +51,7 @@ app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/InvoiceChatbotwLIFF/LIFF/") // redirect to main page
+    res.redirect(302,"/InvoiceChatbotwLIFF/LIFF/") // redirect to main page
 }); 
 
 
