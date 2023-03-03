@@ -51,7 +51,7 @@ app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/") // redirect to main page
+    res.redirect("/InvoiceChatbotwLIFF/LIFF/") // redirect to main page
 }); 
 
 
