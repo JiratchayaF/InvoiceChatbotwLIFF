@@ -1,20 +1,31 @@
 const express = require('express');
 const path = require('path');
-// const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const { redirect } = require('express/lib/response');
 // connect to DB
-// const dbConnect = mongodb.MongoClient.connect('mongodb://localhost:27017/ChatBotInvoiceTest');
-const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/'
+const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
 const app = express();
 
 // รอcomment
-const port = process.env.PORT || 8080;
-//
+// const port = process.env.PORT || 8080;
 
 app.use(express.json())
+app.use(bodyParser.urlencoded({extended:true}))
 
+// create data schema in JSON form
+const CustomerDataSchema = {
+  firstname: String,
+  lastname: String,
+  address: String,
+  taxID: String
+}
+// Create schema model to input
+const CustomerData = mongoose.model("CustomerData", CustomerDataSchema)
+
+mongoose.set("strictQuery", false);
 // db connection
-MongoClient.connect(url, { 
+mongoose.connect(url, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
@@ -27,11 +38,14 @@ MongoClient.connect(url, {
     });
 
 app.post('/post-custmer-data', function(req,res){
-    dbConnect.then(function(db) {
-        delete req.body._id; // for safety reasons
-        db.collection('ChatBotINVTest').insertOne(req.body);
-    });    
-    res.send('Data received:\n' + JSON.stringify(req.body));
+    let NewCustomerData = new CustomerData({
+      firstname: req.body.first_name,
+      lastname: req.body.last_name,
+      address: req.body.Address,
+      taxID: req.body.ID_Number
+    });
+    NewCustomerData.save();
+    res.redirect("/post-custmer-data")
 }); 
 
 app.get('/', function(req, res, next) {
@@ -40,6 +54,6 @@ app.get('/', function(req, res, next) {
 
 });
 // รอcomment
-app.listen(port);
-console.log('Server started at http://localhost:' + port);
+// app.listen(port);
+// console.log('Server started at http://localhost:' + port);
 //
