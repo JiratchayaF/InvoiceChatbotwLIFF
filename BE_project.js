@@ -43,7 +43,7 @@ app.get('/form', function(req, res, next) {
 
 });
 
-app.post('/post-custmer-data', function(req,res){
+app.post('/', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -51,7 +51,7 @@ app.post('/post-custmer-data', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/form") // redirect to GET
+    res.redirect(303,"/form") // redirect to GET
 }); 
 
 
