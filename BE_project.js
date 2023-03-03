@@ -37,6 +37,12 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
+app.get('/form', function(req, res, next) {
+
+    res.sendFile(path.join(__dirname,'LIFF/index.html'));
+
+});
+
 app.post('/post-custmer-data', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
@@ -45,14 +51,10 @@ app.post('/post-custmer-data', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect("/") // redirect to GET
+    res.redirect("/form") // redirect to GET
 }); 
 
-app.get('/', function(req, res, next) {
 
-    res.sendFile(path.join(__dirname,'LIFF/index.html'));
-
-});
 // รอcomment
 // app.listen(port);
 // console.log('Server started at http://localhost:' + port);
