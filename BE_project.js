@@ -37,13 +37,13 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res, next) {
+app.get('/InvoiceChatbotwLIFF/LIFF/', function(req, res, next) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
 });
 
-app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
+app.post('/', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
