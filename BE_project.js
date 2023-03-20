@@ -8,7 +8,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // รอcomment
-// const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
@@ -43,7 +43,7 @@ app.get('/', function(req, res) {
 
 });
 
-app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
+app.post('/', function(req,res){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -51,11 +51,10 @@ app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect('/'); // redirect to main page
+    res.redirect('/InvoiceChatbotwLIFF/LIFF/'); // redirect to main page
 }); 
 
 
 // รอcomment
-// app.listen(port);
-// console.log('Server started at http://localhost:' + port);
-//
+app.listen(port);
+console.log('Server started at http://localhost:' + port);
