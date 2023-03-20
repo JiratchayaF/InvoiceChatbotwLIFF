@@ -38,11 +38,11 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res) {
+// app.get('/', function(req, res) {
 
-    res.sendFile(path.join(__dirname,'LIFF/index.html'));
+//     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
-});
+// });
 
 app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
