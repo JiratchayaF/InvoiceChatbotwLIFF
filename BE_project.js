@@ -54,7 +54,7 @@ app.post('/InvoiceChatbotwLIFF/LIFF', function(req,res,next){
     NewCustomerData.save();
     // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
     console.log('POST request');
-    route.post(302,'https://liff.line.me/1657898846-EryRWbgy');
+    window.location.reload();
   }); 
 
 
