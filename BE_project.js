@@ -43,7 +43,7 @@ app.get('/', function(req, res) {
 
 });
 
-app.post('/submit', function(req,res,next){
+app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -52,7 +52,7 @@ app.post('/submit', function(req,res,next){
     });
     NewCustomerData.save();
     // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
-    res.redirect(307,'https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF');
+    res.redirect(302,'https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/');
   }); 
 
 
