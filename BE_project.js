@@ -8,7 +8,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // รอcomment
-const port = process.env.PORT || 8080;
+// const port = process.env.PORT || 8080;
 
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
@@ -56,5 +56,5 @@ app.post('/', function(req,res){
 
 
 // รอcomment
-app.listen(port);
-console.log('Server started at http://localhost:' + port);
+// app.listen(port);
+// console.log('Server started at http://localhost:' + port);
