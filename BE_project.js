@@ -51,8 +51,9 @@ app.post('/', function(req,res){
       taxID: req.body.ID_Number
     });
     NewCustomerData.save();
-    res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
-}); 
+    // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
+    router.push('/InvoiceChatbotwLIFF/LIFF/')
+  }); 
 
 
 // รอcomment
