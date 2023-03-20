@@ -43,7 +43,7 @@ app.get('/', function(req, res) {
 
 });
 
-app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res,next){
+app.post('/InvoiceChatbotwLIFF/LIFF', function(req,res,next){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
