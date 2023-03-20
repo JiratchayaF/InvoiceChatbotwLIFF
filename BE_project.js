@@ -43,7 +43,7 @@ app.get('/', function(req, res) {
 
 });
 
-app.post('/', function(req,res){
+app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -52,7 +52,7 @@ app.post('/', function(req,res){
     });
     NewCustomerData.save();
     // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
-    router.push('/InvoiceChatbotwLIFF/LIFF/')
+    res.redirect(302,'https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF');
   }); 
 
 
