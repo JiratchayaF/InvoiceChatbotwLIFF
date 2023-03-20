@@ -8,7 +8,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // รอcomment
-// const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
@@ -43,12 +43,6 @@ app.get('/', function(req, res) {
 
 });
 
-app.get('/redirect', function(req, res) {
-
-  res.sendFile(path.join(__dirname,'LIFF/index.html'));
-
-});
-
 app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
@@ -58,10 +52,10 @@ app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res,next){
     });
     NewCustomerData.save();
     // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
-    res.redirect(302,'/redirect');
+    res.redirect(302,'https://liff.line.me/1657898846-EryRWbgy');
   }); 
 
 
 // รอcomment
-// app.listen(port);
-// console.log('Server started at http://localhost:' + port);
+app.listen(port);
+console.log('Server started at http://localhost:' + port);
