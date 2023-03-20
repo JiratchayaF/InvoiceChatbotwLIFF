@@ -9,7 +9,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // รอcomment
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 80;
 
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
@@ -38,11 +38,11 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-// app.get('/', function(req, res) {
+app.get('/', function(req, res) {
 
-//     res.sendFile(path.join(__dirname,'LIFF/index.html'));
+    res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
-// });
+});
 
 app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
@@ -53,12 +53,11 @@ app.post('/', function(req,res,next){
     });
     console.log('updated');
     NewCustomerData.save();
-    // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
+    res.redirect(302, "/"); // redirect to main page
     console.log('POST request');
-    window.location.reload();
   }); 
 
 
 // รอcomment
-app.listen(port);
+app.listen(port,'0.0.0.0');
 console.log('Server started at http://localhost:' + port);
