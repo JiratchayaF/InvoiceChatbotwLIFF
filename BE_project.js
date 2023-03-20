@@ -37,13 +37,19 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/InvoiceChatbotwLIFF/LIFF/', function(req, res) {
+app.get('/', function(req, res) {
 
     res.sendFile(path.join(__dirname,'LIFF/index.html'));
 
 });
 
-app.post('/', function(req,res,next){
+app.get('/redirect', function(req, res) {
+
+  res.sendFile(path.join(__dirname,'LIFF/index.html'));
+
+});
+
+app.post('/InvoiceChatbotwLIFF/LIFF/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       firstname: req.body.first_name,
       lastname: req.body.last_name,
@@ -52,7 +58,7 @@ app.post('/', function(req,res,next){
     });
     NewCustomerData.save();
     // res.redirect(302, "https://jiratchayaf.github.io/InvoiceChatbotwLIFF/LIFF/"); // redirect to main page
-    res.redirect(302,'https://liff.line.me/1657898846-EryRWbgy');
+    res.redirect(302,'/redirect');
   }); 
 
 
