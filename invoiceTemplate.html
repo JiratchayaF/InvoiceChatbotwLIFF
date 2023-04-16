@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Tax Invoice</title>
+	<!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+	<!-- <script src="taxinvoice-generate.js"></script> -->
+	<style>
+		body {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+.invoice-header {
+    display:block;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.invoice-title {
+    text-align: center;
+}
+
+.invoice-header h1 {
+    font-size: 28px;
+    margin: 0;
+    text-align: right;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 30px;
+}
+th, td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+th {
+    background-color: #f2f2f2;
+}
+.invoice-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.invoice-footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+	</style>
+</head>
+<body>
+
+	<div class="invoice-title">
+		<h2>Tax Invoice</h2>
+	</div>
+	<div class="invoice-header">
+		<div>
+			<p>Date: xx/xx/xx</p>
+		</div>
+		<div>
+			<p>Invoice No. xxxxxxxxxx</p>
+		</div>
+	</div>
+
+	<div>
+		<p>John the shrimpman</p>
+		<p>605 Romrog Way, Mountain View, WY, Wyoming, 82939</p>
+		<p>เลขประจำตัวผู้เสียภาษี: xxxxxxxxxxx</p>
+	</div>
+
+	<div>
+		<p>Mr.S</p>
+		<p>605 Romrog Way, Mountain View, WY, Wyoming, 82939</p>
+	</div>
+
+
+	<table>
+		<thead>
+			<tr>
+				<th>No.</th>
+				<th>Description</th>
+				<th>Quantity</th>
+	 			<th>Price</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each items}}
+			<tr>
+				<td>{{no}}</td>
+				<td>{{description}}</td>
+				<td>{{quantity}}</td>
+				<td>{{price}}</td>
+			</tr>
+			{{/each}}		
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="3" style="text-align: right;">Subtotal:</td>
+				<td>{{subtotal}}</td>
+			</tr>
+			<tr>
+				<td colspan="3" style="text-align: right;">Tax:</td>
+				<td>{{tax}}</td>
+			</tr>
+			<tr>
+				<td colspan="3" style="text-align: right;">Total:</td>
+				<td>{{total}}</td>
+			</tr>
+		</tfoot>
+	</table>
+
+	<div class="invoice-footer">
+		<p>Thank you for your business!</p>
+	</div>
+
+</body>
+</html>
