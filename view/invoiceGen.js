@@ -11,7 +11,9 @@ const options = {
 };
 
 const generatePdf = async (req, res, next) => {
+    // data for fill in
     const data = JSON.parse(fs.readFileSync('mockData/data.json', 'utf8'));
+    // template where the data was filled in
     const htmlTemplate = fs.readFileSync('taxinvoice_template.html', 'utf8');
     const fileName = 'Invoice' + data.invoiceNumber;
     let array =[];
