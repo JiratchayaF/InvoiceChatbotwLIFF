@@ -1,0 +1,24 @@
+{
+    "invoiceNumber": "INV-001",
+    "orderNumber": "0123456789",
+    "purchaseDate": "2023-04-01",
+    "customerName": "John Doe",
+    "customerTaxID": "1234567890123",
+    "itemList": [
+      {
+        "itemNo": 1,
+        "itemName": "Product A",
+        "itemQuantity": 5,
+        "itemPrice": 10
+      },
+      {
+        "itemNo": 2,
+        "itemName": "Product B",
+        "itemQuantity": 2,
+        "itemPrice": 20
+    }
+    ],
+    "discount": 10,
+    "total": 100
+  }
+  
