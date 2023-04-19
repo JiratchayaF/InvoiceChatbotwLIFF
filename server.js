@@ -31,13 +31,14 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 // create data schema in JSON form
 const CustomerDataSchema = {
+  orderNumber: String,
   firstname: String,
   lastname: String,
   address: String,
   taxID: String
 }
 // Create schema model to input
-const CustomerData = mongoose.model("CustomerData", CustomerDataSchema)
+const CustomerData = mongoose.model("Customerdatas", CustomerDataSchema)
 
 mongoose.set("strictQuery", false);
 // db connection
@@ -61,6 +62,7 @@ app.get('/', function(req, res) {
 
 app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
+      orderNumber: req.body.OrderNumber,
       firstname: req.body.first_name,
       lastname: req.body.last_name,
       address: req.body.Address,
