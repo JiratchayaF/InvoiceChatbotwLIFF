@@ -64,7 +64,7 @@ app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       orderNumber: req.body.OrderNumber,
       firstname: req.body.first_name,
-      lastname: req.body.last_name,
+      lastname: req.body.last_name, 
       address: req.body.Address,
       taxID: req.body.ID_Number
     });
