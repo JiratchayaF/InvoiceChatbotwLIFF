@@ -10,7 +10,7 @@ const MongoClient = require('mongodb').MongoClient
 
 // connect to DB
 // const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/invoiceData'
-const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/orderTransaction'
+const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/invoiceData'
 const app = express();
 
 // Define server port
