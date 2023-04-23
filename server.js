@@ -14,7 +14,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // Define server port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 app.listen(port, () => 
   console.log( `Server running on port ${port}`)
@@ -64,14 +64,6 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-
-orderData.find()
-    .then(data => {
-      console.log('Here is the result: ', data)
-      
-    }).catch(err => {
-      console.log(err)
-    })
 
 app.get('/', function(req, res) {
 
