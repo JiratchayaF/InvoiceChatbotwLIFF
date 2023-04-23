@@ -28,22 +28,37 @@ mongoose.connect(url, {
         address: String,
         taxID: String
     });
-    // find the specific order number from user
-    CustomerDatas.find({orderNumber: myConst}, function(err, customerDatas) {
-    // CustomerDatas.find({}, function(err, customerDatas) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    // define customer data as variable
-    const data = JSON.stringify(customerDatas)
-    // Print the documents as JSON
-    console.log(data);
-    mongoose.connection.close();
-  });
+    const Transactions = mongoose.model('transactions', {
+        _id: Number,
+        No: Number,
+        orderNumber: String,
+        shipFee: String,
+        productPrice: String,
+        productNumber: String,
+        productName: String,
+        productQuantity: Number,
+        discountBill: String,
+        linePoints: String,
+        discount: String,
+        lspDiscount: String,
+        totalPrice: String,
+        grandTotalPrice: String
     });
     
-})
-	.catch(error => {
-		console.log(error);
-	})
+    // find the specific order number from CustomerDatas
+    CustomerDatas.find({orderNumber: myConst}, (err, customerDatas) => {
+        if (err) throw err;
+  
+    // find the specific order number from Transactions
+    Transactions.find({orderNumber: myConst}, (err, transactions) => {
+        if (err) throw err;
+    
+    // Merge the results and print them to the console
+    const dataMerged = [...customerDatas, ...transactions];
+    const dataResult = JSON.stringify(dataMerged)
+    // console.log('Merged results:', dataMerged);
+    console.log(dataResult);
+  });
+});
+      })})
+
