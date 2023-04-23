@@ -18,6 +18,7 @@
     "mongocli": "^0.0.1",
     "mongodb": "^5.0.1",
     "mongoose": "^6.9.2",
+    "node-fetch": "^2.6.7",
     "pdf-creator-node": "^2.3.5",
     "pdfkit": "^0.13.0"
   },

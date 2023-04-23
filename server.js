@@ -34,12 +34,6 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
 
-// // Retrieving data from MongoDB
-// const Schema  = mongoose.Schema
-
-
-// const orderData = mongoose.model('orderSchema', orderSchema);
-
 // // // Posting data from invoice request form to MongoDB
 // // crceate data schema in JSON form
 // const CustomerDataSchema = {
@@ -53,12 +47,10 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 const orderSchema = new mongoose.Schema({
   _id: Number,
-  customerName: String,
-  date: String,
+  customerName: String
 })
 
 const orderData = mongoose.model('orderTransaction', orderSchema)
-module.exports = orderData
 
 
 mongoose.set("strictQuery", false);
@@ -78,13 +70,7 @@ mongoose.connect(url, {
     });
 
 
-orderData.find()
-    .then(data => {
-      console.log('Here is the result: ', data)
-      
-    }).catch(err => {
-      console.log(err)
-    })
+
 
 app.get('/', function(req, res) {
 
@@ -104,20 +90,6 @@ app.get('/', function(req, res) {
 //     res.redirect(302, "/"); // redirect to main page
 //     console.log('POST request');
 //   }); 
-
-
-// // Rethrieve transaction data from MongoDB
-//  app.get('/orders', (req, res) => {
-//   console.log('routing to /orders')
-//   orderData.find()
-//   .then((client) => {
-//     res.send(client);
-//     console.log('data found!')
-//   }).catch((err) => {
-//     console.log(err)
-//   }) 
-//  })
-
 
 // run app on local server
 // app.listen(port,'0.0.0.0');
