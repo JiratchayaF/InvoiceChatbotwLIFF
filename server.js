@@ -37,7 +37,6 @@ app.use(bodyParser.urlencoded({extended:true}))
 // // Retrieving data from MongoDB
 // const Schema  = mongoose.Schema
 
-<<<<<<< HEAD
 // create data schema in JSON form
 const CustomerDataSchema = {
   orderNumber: String,
@@ -45,34 +44,9 @@ const CustomerDataSchema = {
   lastname: String,
   address: String,
   taxID: String
-}
+} //
 // Create schema model to input
 const CustomerData = mongoose.model("Customerdatas", CustomerDataSchema)
-=======
-
-// const orderData = mongoose.model('orderSchema', orderSchema);
-
-// // // Posting data from invoice request form to MongoDB
-// // crceate data schema in JSON form
-// const CustomerDataSchema = {
-//   firstname: String,
-//   lastname: String,
-//   address: String,
-//   taxID: String
-// }
-// Create schema model to input
-// const CustomerData = mongoose.model("CustomerData", CustomerDataSchema)
-
-const orderSchema = new mongoose.Schema({
-  _id: Number,
-  customerName: String,
-  date: String,
-})
-
-const orderData = mongoose.model('orderTransaction', orderSchema)
-module.exports = orderData
-
->>>>>>> 788159a057f6fb4f43160dd20067de8988c956b5
 
 mongoose.set("strictQuery", false);
 // db connection
@@ -105,7 +79,6 @@ app.get('/', function(req, res) {
 
 });
 
-<<<<<<< HEAD
 app.post('/', function(req,res,next){
     let NewCustomerData = new CustomerData({
       orderNumber: req.body.OrderNumber,
@@ -119,33 +92,6 @@ app.post('/', function(req,res,next){
     res.redirect(302, "/"); // redirect to main page
     console.log('POST request');
   }); 
-=======
-// app.post('/', function(req,res,next){
-//     let NewCustomerData = new CustomerData({
-//       firstname: req.body.first_name,
-//       lastname: req.body.last_name,
-//       address: req.body.Address,
-//       taxID: req.body.ID_Number
-//     });
-//     console.log('updated');
-//     NewCustomerData.save();
-//     res.redirect(302, "/"); // redirect to main page
-//     console.log('POST request');
-//   }); 
-
-
-// // Rethrieve transaction data from MongoDB
-//  app.get('/orders', (req, res) => {
-//   console.log('routing to /orders')
-//   orderData.find()
-//   .then((client) => {
-//     res.send(client);
-//     console.log('data found!')
-//   }).catch((err) => {
-//     console.log(err)
-//   }) 
-//  })
->>>>>>> 788159a057f6fb4f43160dd20067de8988c956b5
 
 
 // run app on local server
