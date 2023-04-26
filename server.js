@@ -9,20 +9,30 @@ const { route } = require('express/lib/application');
 
 // connect to DB
 const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
-const app = express();
+const app = express()
 
 // Define server port
 const port = process.env.PORT || 100;
 
 // view engine setup
 app.set('view', express.static(path.join(__dirname, '/view')))
-app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 // Middleware layer: parse JSON data
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
+
+// ROUTING SECTION //
+// 
+app.get('/', function(req, res) {
+
+  res.sendFile(path.join(__dirname,'view/index.html'));
+
+});
+
+
+// MongoDB connecting
 // create data schema in JSON form
 const CustomerDataSchema = {
   orderNumber: String,
@@ -48,13 +58,6 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
-app.get('/', function(req, res) {
-
-    res.sendFile(path.join(__dirname,'view/index.html'));
-
-});
-
-// define order number variable in global
 
 // define order number variable in global
 let dataMerged = {}
@@ -184,7 +187,9 @@ app.post('/', (req,res) => {
     date: date
   })
 
-  pdf.create(invoice_pdf).toFile('./taxinvoice.pdf', 
+  const fileName = 'INVOICE_' + customerData.orderNumber
+
+  pdf.create(invoice_pdf).toFile(fileName, 
   (err, res) => {
     if (err) {
         return console.log(err);
@@ -199,9 +204,9 @@ app.post('/', (req,res) => {
     NewCustomerData.save(); // Save customerData to mongodb
     // redirect to main page
     res.redirect(302, "/"); 
-}) // Post 
+}) // end of post request
 
 // run app on local server
 app.listen(port, () => {
-  console.log(`Server started on http://localhost${port}`)
+  console.log(`Server started on http://localhost:${port}`)
 })// // console.log('Server started at http://localhost:' + port);

@@ -1,0 +1,41 @@
+body {
+    background-image: url('/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
+
+
+
+.content-card {
+    background-color: #fff;
+    padding: 40px;
+    height: auto;
+    width: 50%;
+    position: absolute;
+    bottom: 0;
+    left: 50%;    
+    bottom: 0;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transform: translateX(-50%);
+}
+
+.form-container {
+    padding: 30px;
+}
+
+.img-wrapper {
+    width: 10%;
+    height: auto;
+}
+
+.credit {
+    position: absolute;
+    bottom: 0;
+}
+
+.center-topic {
+    text-align: center;
+}
+
