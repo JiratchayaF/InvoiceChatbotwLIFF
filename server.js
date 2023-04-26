@@ -9,30 +9,20 @@ const { route } = require('express/lib/application');
 
 // connect to DB
 const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
-const app = express()
+const app = express();
 
 // Define server port
-const port = process.env.PORT || 100;
+const port = process.env.PORT || 80;
 
 // view engine setup
 app.set('view', express.static(path.join(__dirname, '/view')))
+app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 // Middleware layer: parse JSON data
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
-
-// ROUTING SECTION //
-// 
-app.get('/', function(req, res) {
-
-  res.sendFile(path.join(__dirname,'view/index.html'));
-
-});
-
-
-// MongoDB connecting
 // create data schema in JSON form
 const CustomerDataSchema = {
   orderNumber: String,
@@ -58,10 +48,15 @@ mongoose.connect(url, {
       console.log("Failed to connect to MongoDB:", err);
     });
 
+app.get('/', function(req, res) {
+
+    res.sendFile(path.join(__dirname,'view/index.html'));
+
+});
 
 // define order number variable in global
 let dataMerged = {}
-app.post('/', (req,res) => {
+app.post('/submit', (req,res) => {
   //post customers data in to mongodb by request the OrderNumber of submited form
     orderNumber = req.body.OrderNumber;
     let NewCustomerData = new CustomerData({
@@ -181,32 +176,39 @@ app.post('/', (req,res) => {
   const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
 
-  const invoice_pdf = invoiceTemplate({
+  invoice_pdf = invoiceTemplate({
     finalOrder: finalOrder, 
     customerData: customerData,
     date: date
   })
 
-  const fileName = 'INVOICE_' + customerData.orderNumber
+});
 
-  pdf.create(invoice_pdf).toFile(fileName, 
+    });
+    // Save customerData to mongodb
+    NewCustomerData.save(); 
+    // redirect to main page
+    res.redirect("/download"); 
+}) // Post customer data
+
+app.post('/download-file', (req,res) => {
+  pdf.create(invoice_pdf).toFile('taxinvoice.pdf', 
   (err, res) => {
     if (err) {
         return console.log(err);
     } else console.log(`PDF file saved to ${res.filename}`);
   }
 );
+}) // Post downlaod file
 
+
+app.get('/download', (req, res) => {
+  // render the next page here
+  res.sendFile(__dirname + '/view/download.html');
 });
 
-    });
-    
-    NewCustomerData.save(); // Save customerData to mongodb
-    // redirect to main page
-    res.redirect(302, "/"); 
-}) // end of post request
-
 // run app on local server
+// app.listen(port,'0.0.0.0')
 app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`)
 })// // console.log('Server started at http://localhost:' + port);
