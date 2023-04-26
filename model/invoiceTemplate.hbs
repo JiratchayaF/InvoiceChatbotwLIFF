@@ -12,117 +12,123 @@
 		}
 
     .containers {
-      position: relative;;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
 		.invoice-header {
-			display:block;
+			display: block;
 			align-items: center;
 			margin-top: 20px; 
       font-weight: bold;
 	  }
 
+     .user-details {
+      border: 1px solid #EEEEEE;
+      border-radius: 10px;
+
+    }
+
+    .user-details td {
+      border: 1px solid #EEEEEE;
+      max-block-size: 50px;
+      width: 33.33%;
+    }
+    
+    .com-details {
+      border: none;
+      margin-bottom: 30px;
+    }
+
+    .com-details td {
+      height: 50px;
+    }
+
     .invoice-title {
       text-align: center;
-      margin-top: 20px;
-   }
-   .invoice-header-detail {
-    align-items: end;
-   }
-
-   thead th {
-      text-align: center;
-   }
-
-   .address {
-    border-radius: 2px;
-   }
-   
-   th, td {
-      text-align: left;
-  }
-
-  .cell-size {
-    width: 100px;
-    height: 5px;
-  }
-
-   .invoice-footer-container {
-      position: absolute;
-      bottom: 0;
+      margin-top: 10px;
    }
    
    .invoice-footer {
-      display: flex;
-      {{!-- justify-content: space-between;
-      align-items: center; --}}
-   }
+    border: none;
+    margin-top: auto;   
+  }
 
-   .signature {
-    background-color: pink;
-   }
+  .invoice-footer td {
+      height: 30px;
+      width: 33.33%;
+      text-align: center;
+    }
 
+
+   .name {
+    color: #FEC896;
+    font-weight: bold;
+   }
+   
 	</style>
 </head>
   <div id="order-list"></div>
   <body>
-    <div class="container">
+    <div class="containers">
     <div class="mx-auto sm">
+      
 
-            <!-- company details: name, address, tax ID and telephone number -->
-      <table class="table address">
+    <!-- company details: name, address, tax ID and telephone number -->
+      <table class="table com-details">
         <tbody>
           <tr>
-            <td class="cell-size">
-              <div>
+            <td style="color: white">
                 <h3>Bringhome.theBacon</h3>
-              </div>
+                <h3>here will be the logo</h3>
+                <h3>here will be the logo</h3>
             </td>
-            <td class="cell-size">
-              <div>
-                <h3>Bringhome.theBacon</h3>
+            <td>
+                <h3 class="name">Bringhome.theBacon</h3>
                 <span>55/345 Aspire Sathorn-Taksin, ถนนราชพฤกษ์, แขวงบางค้อ, เขตจอมทอง, กทม. 10150</span>
                 <br>
-                <span><b>หมายเลขประจำตัวผู้เสียภาษี:</b> </span>
+                <span>หมายเลขประจำตัวผู้เสียภาษี: xxxxxxxxxxxx</span>
                 <br>
-                <span><b>หมายเลขโทรศัพท์:</b> </span>
-              </div>
+                <span>หมายเลขโทรศัพท์: xxx-xxxx-xxx</span>
             </td>
           </tr>
         </tbody>
       </table>
       <!-- end of company details -->
 
-
       <!-- invoice title: title, date, invoice number -->
       <div class="invoice-title">
-        <h2 class="fw-bold">ใบเสร็จรับเงิน/ใบกำกับภาษี</h2>
-        <h2>Receipt/Tax Invoice</h2>
+        <h2>ใบเสร็จรับเงิน/ใบกำกับภาษี</h2>
+        <h3 style="margin-top: auto">Receipt/Tax Invoice</h3>
       </div>
       <!-- end of invoice title -->
 
       <br>
 
       <!-- company details: name, address, tax ID and telephone number -->
-      <table class="table address">
-        <tbody>
+      <table class="table user-details">
           <tr>
-            <td class="cell-size"> 
+            <td scope="col"> 
+                <h3 class="name">{{customerData.firstName}} &nbsp; {{customerData.lastName}}</h3>
+                <span>{{customerData.address}}</span>
+                <br>
+                <span><b>หมายเลขประจำตัวผู้เสียภาษี: {{customerData.taxID}}</b> </span>
+                <br>
+                <span><b>หมายเลขโทรศัพท์: xxx-xxxx-xxx</b> </span>
+            </td>
+            {{!-- end of first cell --}}
+
+            <td scope="col">
               <div>
-                <h3>ชื่อลูกคร้า</h3>
-                <span>55/345 Aspire Sathorn-Taksin, ถนนราชพฤกษ์, แขวงบางค้อ, เขตจอมทอง, กทม. 10150</span>
+                <div>วันที่ออกบิล:&nbsp;&nbsp;&nbsp;{{date}}</div>
+                <div>เลขที่ใบกำกับภาษี:&nbsp;&nbsp;&nbsp;1</div>
                 <br>
-                <span><b>หมายเลขประจำตัวผู้เสียภาษี:</b> </span>
-                <br>
-                <span><b>หมายเลขโทรศัพท์:</b> </span>
+                <div>หมายเลขคำสั่งซื้อสินค้า:&nbsp;&nbsp;{{obj.orderNumber}}</div>
               </div>
             </td>
-            <td class="cell-size">
-              <div>
-              <div>วันที่: {{date}}</div>
-              <div>เลขที่/No.:</div>
-              </div>
-            </td>
+            {{!-- end of second cell --}}
+
           </tr>
         </tbody>
       </table>
@@ -130,32 +136,41 @@
 
     
       <!-- item details are represented below in invoice table -->
-      <div class="table-resoinsive">
-      <table class="table">
+      <div class="table-responsive">
+        <table class="table table-sm" style="padding: 10px">
         
         <!-- table header -->
-        <thead style="background-color: #FFE9D5"> 
-          <tr>
-            <th scope="col">ลำดับ</th>
-            <th scope="col">รายการ</th>
-            <th scope="col">จำนวน</th>
-            <th scope="col">ราคาต่อหน่วย</th>
-            <th scope="col">จำนวนเงิน</th>
+        <thead> 
+          <tr style="background-color: #FFE9D5">
+            <th scope="col" style="text-align: left">ลำดับ</th>
+            <th scope="col" style="text-align: left">รายการสินค้า</th>
+            <th scope="col" style="text-align: right">จำนวน</th>
+            <th scope="col" style="text-align: right">ราคาต่อหน่วย</th>
+            <th scope="col" style="text-align: right">จำนวนเงิน</th>
           </tr>
         </thead>
         <!-- end of table header -->
 
         <!-- table main content: loop show item datas -->
         <tbody>
-            {{#each obj.targetOrder}}
-            <tr>
-              <td scope="row">{{@key}}</td>
-              <td>{{this.name}}</td>
-              <td>{{this.quantity}}</td>
-              <td>{{this.price}}</td>
-              <td>{{this.total}}</td>
+            {{#each finalOrder.orderData}}
+            <tr style="border-bottom: 1px solid #EEEEEE;">
+              <td scope="row" class="cell-size" style="text-align: left">{{@key}}</td>
+              <td style="text-align: left">{{this.name}}</td>
+              <td style="text-align: right">{{this.quantity}}</td>
+              <td style="text-align: right">{{this.price}}</td>
+              <td style="text-align: right">{{this.total}}</td>
             </tr>
           {{/each}}	
+
+          <tr>
+            <th scope="col" style="text-align: left"></th>
+            <th scope="col" style="text-align: left"></th>
+            <th scope="col" style="text-align: right"></th>
+            <th scope="col" style="text-align: right"></th>
+            <th scope="col" style="text-align: right"></th>
+          </tr>
+
 
           <!-- added row of table to fulfilled the invoice page -->
           <!-- หาทาง fixed จำนวนแถวของตารางให้พอดีเพราะตอนนี้มันยังโชว์ตามจำนวน product อยู่ -->
@@ -168,59 +183,59 @@
         <!-- table footer: summary of order -->
         <tfoot>
           <tr>
-            <td colspan="4" style="text-align: right;">รวมเป็นเงิน</td>
-            <td>{{obj.gtotal}}</td>
+            <th colspan="4" style="text-align: right;">รวมเป็นเงิน</td>
+            <th colspan="4" style="text-align: right; border-bottom: 1px solid #EEEEEE;">{{finalOrder.gtotal}} บาท</td>
           </tr>
 
           <tr>
-            <td colspan="4" style="text-align: right;">ส่วนลด</td>
-            <td>{{obj.discount}}</td>
+            <th colspan="4" style="text-align: right;">ภาษีมูลค่าเพิ่ม 7%</td>
+            <th colspan="4" style="text-align: right; border-bottom: 1px solid #EEEEEE;">{{finalOrder.vat}} บาท</td>
           </tr>
 
           <tr>
-            <td colspan="4" style="text-align: right;">ค่าส่ง</td>
-            <td>{{obj.shipFee}}</td>
+            <th colspan="4" style="text-align: right;">ส่วนลด</td>
+            <th colspan="4" style="text-align: right; border-bottom: 1px solid #EEEEEE;">{{finalOrder.sumDiscount}} บาท</td>
           </tr>
 
           <tr>
-            <td colspan="4" style="text-align: right;">จำนวนภาษีมูลค่าเพิ่ม</td>
-            <td>{{obj.vat}}</td>
+            <th colspan="4" style="text-align: right;">ค่าจัดส่ง</td>
+            <th colspan="4" style="text-align: right; border-bottom: 1px solid #EEEEEE;">{{finalOrder.shipFee}} บาท</td>
           </tr>
 
-          <tr style="background-color: #FFE9D5">
-            <td colspan="4" style="text-align: right;"><b>จำนวนเงินทั้งสิ้น</b></td>
-            <td>{{obj.subtotal}}</td>
+          <tr>
+            <th colspan="4" style="text-align: right; background-color: #FFE9D5"><b>จำนวนเงินรวมทั้งสิ้น</b></td>
+            <th colspan="4" style="text-align: right; background-color: #FFE9D5">{{finalOrder.subtotal}} บาท</td>
           </tr>
         </tfoot>
         <!-- end of table footer-->
-      </table>
-      <!-- end of invoice table -->
-      </div>
+    
       <!--end of invoice table container  -->
+      </table>
+      </div>
+      <!-- end of invoice table -->
 
       <!-- invoice footer: company signature and customer signature -->
-      <table class="table address">
-        <tbody>
+      <div class="invoice-footer">
+      <table class="table">
           <tr>
-            <td>
-              <div>
-                <span><b>ผู้รับสินค้า</b> </span>
-                <br>
-                <span><b>หมายเลขโทรศัพท์:</b> </span>
-              </div>
+            <td scope="col"> 
+              <br>
+              <br>
+              <span>(ลายมือชื่อผู้รับสินค้า)</span>
             </td>
-            <td>
-              <div>
-                <span><b>หมายเลขประจำตัวผู้เสียภาษี:</b> </span>
-                <br>
-                <span><b>หมายเลขโทรศัพท์:</b> </span>
-              </div>
+            {{!-- end of first cell --}}
+            
+            <td> 
             </td>
-          </tr>
-        </tbody>
-      </table>
+
+            <td scope="col"> 
+            </td>
+            {{!-- end of second cell --}}
+          </tr> 
+          </table> 
         <!-- end of invoice footer -->
       </div>
+      <span style="align-items: center;">This invoice is digitally signed by © Copyright @Bringhome.theBacon </span>
       <!-- end of invoice footer container -->
     </div>
     <!-- end of container wrapper -->
