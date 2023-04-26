@@ -167,13 +167,15 @@ app.post('/request-submitted', (req,res) => {
     const finalOrder = {
       customerData: customerData,
       orderData: orderData,
+      orderNumber: customerData.orderNumber,
       subtotal: totalBeforeTax,
       discount: sumDiscount,
       shipFee: shipFee,
       vat: vat,
       gtotal: grandTotal    
     }
-
+    
+    console.log('order number:', orderNumber)
   const date = new Date().toLocaleDateString()
 
   const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
@@ -185,7 +187,7 @@ app.post('/request-submitted', (req,res) => {
     date: date
   })
 
-});
+})
 
     });
     // Save customerData to mongodb
@@ -193,7 +195,6 @@ app.post('/request-submitted', (req,res) => {
     // redirect to main page
     res.redirect("/download"); 
 }) // Post customer data
-
 
 app.post('/download-file', (req,res) => {
   pdf.create(invoice_pdf).toFile('./taxinvoice.pdf', 

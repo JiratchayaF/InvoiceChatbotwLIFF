@@ -25,13 +25,10 @@
 	  }
 
      .user-details {
-      border: 1px solid #EEEEEE;
       border-radius: 10px;
-
     }
 
     .user-details td {
-      border: 1px solid #EEEEEE;
       max-block-size: 50px;
       width: 33.33%;
     }
@@ -63,7 +60,7 @@
 
 
    .name {
-    color: #FEC896;
+    color: #dc3545;
     font-weight: bold;
    }
    
@@ -80,17 +77,18 @@
         <tbody>
           <tr>
             <td style="color: white">
+                <img src="/public/logo.png">
                 <h3>Bringhome.theBacon</h3>
                 <h3>here will be the logo</h3>
                 <h3>here will be the logo</h3>
             </td>
             <td>
                 <h3 class="name">Bringhome.theBacon</h3>
-                <span>55/345 Aspire Sathorn-Taksin, ถนนราชพฤกษ์, แขวงบางค้อ, เขตจอมทอง, กทม. 10150</span>
+                <span>24/56 Bang Na-Trat Rd, Tambon Bang Sao Thong, Amphoe Bang Sao Thong, Chang Wat Samut Prakan 10540</span>
                 <br>
-                <span>หมายเลขประจำตัวผู้เสียภาษี: xxxxxxxxxxxx</span>
+                <span>หมายเลขประจำตัวผู้เสียภาษี: 123456789012</span>
                 <br>
-                <span>หมายเลขโทรศัพท์: xxx-xxxx-xxx</span>
+                <span>หมายเลขโทรศัพท์: 098-7490-837</span>
             </td>
           </tr>
         </tbody>
@@ -113,9 +111,7 @@
                 <h3 class="name">{{customerData.firstName}}&nbsp;{{customerData.lastName}}</h3>
                 <span>{{customerData.address}}</span>
                 <br>
-                <span><b>หมายเลขประจำตัวผู้เสียภาษี: {{customerData.taxID}}</b> </span>
-                <br>
-                <span><b>หมายเลขโทรศัพท์: xxx-xxxx-xxx</b> </span>
+                <span>หมายเลขประจำตัวผู้เสียภาษี: {{customerData.taxID}}</span>
             </td>
             {{!-- end of first cell --}}
 
@@ -123,8 +119,7 @@
               <div>
                 <div>วันที่ออกบิล:&nbsp;&nbsp;&nbsp;{{date}}</div>
                 <div>เลขที่ใบกำกับภาษี:&nbsp;&nbsp;&nbsp;1</div>
-                <br>
-                <div>หมายเลขคำสั่งซื้อสินค้า:&nbsp;&nbsp;{{finalOrder.orderData.orderNumber}}</div>
+                <div>หมายเลขคำสั่งซื้อสินค้า:&nbsp;&nbsp;{{finalOrder.orderNumber}}</div>
               </div>
             </td>
             {{!-- end of second cell --}}
@@ -141,7 +136,7 @@
         
         <!-- table header -->
         <thead> 
-          <tr style="background-color: #FFE9D5">
+          <tr style="background-color: #F6CBCF">
             <th scope="col" style="text-align: left">ลำดับ</th>
             <th scope="col" style="text-align: left">รายการสินค้า</th>
             <th scope="col" style="text-align: right">จำนวน</th>
@@ -170,13 +165,6 @@
             <th scope="col" style="text-align: right"></th>
             <th scope="col" style="text-align: right"></th>
           </tr>
-
-
-          <!-- added row of table to fulfilled the invoice page -->
-          <!-- หาทาง fixed จำนวนแถวของตารางให้พอดีเพราะตอนนี้มันยังโชว์ตามจำนวน product อยู่ -->
-          <!-- เช่น มี 2 รายการ ตารางจะมีแค่ 2 แถว -->
-          <!-- * NEED NEW SOLUTION !! -->
-
         </tbody>
         <!-- end of table body -->
 
@@ -203,8 +191,8 @@
           </tr>
 
           <tr>
-            <th colspan="4" style="text-align: right; background-color: #FFE9D5"><b>จำนวนเงินรวมทั้งสิ้น</b></td>
-            <th colspan="4" style="text-align: right; background-color: #FFE9D5">{{finalOrder.subtotal}} บาท</td>
+            <th colspan="4" style="text-align: right; background-color: #F6CBCF;"><b>จำนวนเงินรวมทั้งสิ้น</b></td>
+            <th colspan="4" style="text-align: right; background-color: #F6CBCF;">{{finalOrder.subtotal}} บาท</td>
           </tr>
         </tfoot>
         <!-- end of table footer-->
@@ -235,7 +223,8 @@
           </table> 
         <!-- end of invoice footer -->
       </div>
-      <span style="align-items: center;">This invoice is digitally signed by © Copyright @Bringhome.theBacon </span>
+      <span style="position: absolute; bottom: 0; left: 50%;">This invoice is digitally signed by @Bringhome.theBacon
+      <br>Signed date: {{date}} </span>
       <!-- end of invoice footer container -->
     </div>
     <!-- end of container wrapper -->
