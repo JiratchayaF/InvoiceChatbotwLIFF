@@ -110,7 +110,7 @@
       <table class="table user-details">
           <tr>
             <td scope="col"> 
-                <h3 class="name">{{customerData.firstName}} &nbsp; {{customerData.lastName}}</h3>
+                <h3 class="name">{{customerData.firstName}}&nbsp;{{customerData.lastName}}</h3>
                 <span>{{customerData.address}}</span>
                 <br>
                 <span><b>หมายเลขประจำตัวผู้เสียภาษี: {{customerData.taxID}}</b> </span>
@@ -124,7 +124,7 @@
                 <div>วันที่ออกบิล:&nbsp;&nbsp;&nbsp;{{date}}</div>
                 <div>เลขที่ใบกำกับภาษี:&nbsp;&nbsp;&nbsp;1</div>
                 <br>
-                <div>หมายเลขคำสั่งซื้อสินค้า:&nbsp;&nbsp;{{obj.orderNumber}}</div>
+                <div>หมายเลขคำสั่งซื้อสินค้า:&nbsp;&nbsp;{{finalOrder.orderData.orderNumber}}</div>
               </div>
             </td>
             {{!-- end of second cell --}}
