@@ -53,11 +53,19 @@ body {
 }
 
 .center-alignment {
+    /* position: relative; */
     top: 50%;
     left: 50%;
     text-align: center;
     margin-top: 25%;
 }
+
+.btn-alignment {
+    top: 50%;
+    left: 50%;
+    text-align: center;
+}
+
 
 
 
