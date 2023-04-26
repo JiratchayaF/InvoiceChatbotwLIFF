@@ -6,11 +6,10 @@ body {
 }
 
 
-
 .content-card {
     background-color: #fff;
     padding: 40px;
-    height: auto;
+    height: 750px;
     width: 50%;
     position: absolute;
     bottom: 0;
@@ -21,8 +20,22 @@ body {
     transform: translateX(-50%);
 }
 
+.content-card-dl {
+    background-color: #fff;
+    padding: 40px;
+    height: 750px;
+    width: 50%;
+    position: absolute;
+    bottom: 0;
+    left: 50%;    
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transform: translateX(-50%);
+}
+
+
 .form-container {
-    padding: 30px;
+    padding-top: 30px;
 }
 
 .img-wrapper {
@@ -38,4 +51,13 @@ body {
 .center-topic {
     text-align: center;
 }
+
+.center-alignment {
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    margin-top: 25%;
+}
+
+
 

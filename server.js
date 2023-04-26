@@ -55,8 +55,10 @@ app.get('/', function(req, res) {
 });
 
 // define order number variable in global
-let dataMerged = {}
-app.post('/submit', (req,res) => {
+// let dataMerged = {}
+
+let finalOrder = {}
+app.post('/request-submitted', (req,res) => {
   //post customers data in to mongodb by request the OrderNumber of submited form
     orderNumber = req.body.OrderNumber;
     let NewCustomerData = new CustomerData({
@@ -163,6 +165,7 @@ app.post('/submit', (req,res) => {
     
 
     const finalOrder = {
+      customerData: customerData,
       orderData: orderData,
       subtotal: totalBeforeTax,
       discount: sumDiscount,
@@ -171,7 +174,7 @@ app.post('/submit', (req,res) => {
       gtotal: grandTotal    
     }
 
-    const date = new Date().toLocaleDateString()
+  const date = new Date().toLocaleDateString()
 
   const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
@@ -191,14 +194,16 @@ app.post('/submit', (req,res) => {
     res.redirect("/download"); 
 }) // Post customer data
 
+
 app.post('/download-file', (req,res) => {
-  pdf.create(invoice_pdf).toFile('taxinvoice.pdf', 
+  pdf.create(invoice_pdf).toFile('./taxinvoice.pdf', 
   (err, res) => {
     if (err) {
         return console.log(err);
     } else console.log(`PDF file saved to ${res.filename}`);
   }
-);
+)
+
 }) // Post downlaod file
 
 
