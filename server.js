@@ -12,7 +12,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // Define server port
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 3000;
 
 // view engine setup
 app.set('view', express.static(path.join(__dirname, '/view')))
@@ -29,7 +29,8 @@ const CustomerDataSchema = {
   firstname: String,
   lastname: String,
   address: String,
-  taxID: String
+  taxID: String,
+  mobileNum: String
 }
 // Create schema model to input to db
 const CustomerData = mongoose.model("Customerdatas", CustomerDataSchema)
@@ -55,9 +56,8 @@ app.get('/', function(req, res) {
 });
 
 // define order number variable in global
-// let dataMerged = {}
-
 let finalOrder = {}
+
 app.post('/request-submitted', (req,res) => {
   //post customers data in to mongodb by request the OrderNumber of submited form
     orderNumber = req.body.OrderNumber;
@@ -66,7 +66,8 @@ app.post('/request-submitted', (req,res) => {
       firstname: req.body.first_name,
       lastname: req.body.last_name, 
       address: req.body.Address,
-      taxID: req.body.ID_Number
+      taxID: req.body.ID_Number,
+      mobileNum: req.body.mobileNum,
     });
 
     // Define collection customerdatas model
@@ -76,7 +77,8 @@ app.post('/request-submitted', (req,res) => {
       firstname: String,
       lastname: String,
       address: String,
-      taxID: String
+      taxID: String,
+      mobileNum: String
     });
 
     // Define collection transactions model
@@ -107,31 +109,35 @@ app.post('/request-submitted', (req,res) => {
         // Merge the results and change data to JSON as "dataResult"
         dataMerged = [...customerDatas, ...transactions];
 
-
-        // At dataMerged[0] is customerData obj
+        console.log('Merged customerData with orderData')
+        // customerData obj dataMerged[0]
        const customerData = {
         orderNumber: dataMerged[0].orderNumber,
         firstName: dataMerged[0].firstname,
         lastName: dataMerged[0].lastname,
         address: dataMerged[0].address,
-        taxID: dataMerged[0].taxID
+        taxID: dataMerged[0].taxID,
+        mobileNum: dataMerged[0].mobileNum,
         }
-        // console.log('Array of customerData',customerData)
 
       let orderData = []
       let orderArray = []
-       // While from dataMerged[1] to dataMerged[i] are orderData obj
+
+       // orderData obj: dataMerged[1] to dataMerged[i] are orderData obj
        for (let i = 1; i < dataMerged.length; i++) {
         orderArray = dataMerged[i]
         orderData.push({
-          name: orderArray.productName,
-          price: orderArray.productPrice,
+          prodName: orderArray.productName,
+          prodId: orderArray.productNumber,
+          price: parseFloat(orderArray.productPrice).toFixed(2),          
           quantity: orderArray.productQuantity,
           shipFee: orderArray.shipFee,
-          discount: orderArray.discount,
-          linePoints: orderArray.linePoints,
-          lspDiscount: orderArray.lspDiscount,
-          total: orderArray.productPrice*orderArray.productQuantity        
+          discount: orderArray.productPrice,
+          linePoints: orderArray.productPrice,
+          lspDiscount: orderArray.productPrice,
+          total: orderArray.productPrice * orderArray.productQuantity,
+
+          totalFloat: parseFloat(orderArray.productPrice * orderArray.productQuantity).toFixed(2)
       })
     }
       
@@ -152,31 +158,30 @@ app.post('/request-submitted', (req,res) => {
   
 
     sumDiscount = discount+linePoints+lspDiscount
-    console.log('total discount: ', sumDiscount)
-    
     totalBeforeTax = (subTotal + shipFee) - sumDiscount // totalBeforeTax => total price of every product plus shipping fee
-    console.log('total before tax: ', totalBeforeTax)
-
     vat = (totalBeforeTax * 7) / 100   // VAT 7% that was already include in product price
-    console.log('vat: ', vat)
+    grandTotal = subTotal - vat   // Actual total price of product after VAT
+    console.log('Calculate value-at-the-end')
 
-    grandTotal = subTotal - vat   // Actual total price of product before VAT
-    console.log('Calculate all value at the end of tax invoice', grandTotal)
-    
-
-    const finalOrder = {
+    finalOrder = {
       customerData: customerData,
       orderData: orderData,
       orderNumber: customerData.orderNumber,
-      subtotal: totalBeforeTax,
-      discount: sumDiscount,
-      shipFee: shipFee,
-      vat: vat,
-      gtotal: grandTotal    
+      subtotal: parseFloat(totalBeforeTax).toFixed(2),
+      discount: parseFloat(sumDiscount).toFixed(2),
+      shipFee: parseFloat(shipFee).toFixed(2),
+      vat: parseFloat(vat).toFixed(2),
+      gtotal: parseFloat(grandTotal).toFixed(2)  
     }
+
+    console.log('Charot is preparing your data....')
     
-    console.log('order number:', orderNumber)
   const date = new Date().toLocaleDateString()
+  const imgPath = path.resolve(__dirname, './public/logo.png')
+
+  Handlebars.registerHelper('addOne', function(value) {
+    return value + 1;
+  });
 
   const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
@@ -184,37 +189,42 @@ app.post('/request-submitted', (req,res) => {
   invoice_pdf = invoiceTemplate({
     finalOrder: finalOrder, 
     customerData: customerData,
-    date: date
+    date: date,
+    imgPath: imgPath
   })
+  console.log('Charot has filled e-tax invoice and ready to be donwload!')
 
 })
 
     });
     // Save customerData to mongodb
     NewCustomerData.save(); 
-    // redirect to main page
-    res.redirect("/download"); 
+
+    // redirect to request-submitted
+    res.redirect('/request-submitted'); 
 }) // Post customer data
 
-app.post('/download-file', (req,res) => {
-  pdf.create(invoice_pdf).toFile('./taxinvoice.pdf', 
-  (err, res) => {
-    if (err) {
-        return console.log(err);
-    } else console.log(`PDF file saved to ${res.filename}`);
-  }
-)
-
-}) // Post downlaod file
-
-
-app.get('/download', (req, res) => {
-  // render the next page here
+// Show download page after submit form
+app.get('/request-submitted', (req, res) => {
   res.sendFile(__dirname + '/view/download.html');
 });
 
+// Redirect to '/download-file' after click download button
+app.post("/download-e-tax-inv", (req, res) => {
+  pdf.create(invoice_pdf).toStream((err, stream) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename=TAXINV_${finalOrder.orderNumber}.pdf`)
+    stream.pipe(res);
+  })
+  console.log(`TAXINV_${finalOrder.orderNumber} is downloaded`)
+})
+
 // run app on local server
-app.listen(port,'0.0.0.0')
-// app.listen(port, () => {
-//   console.log(`Server started on http://localhost:${port}`)
-// })// // console.log('Server started at http://localhost:' + port);
+// app.listen(port,'0.0.0.0')
+app.listen(port, () => {
+  console.log(`Server started on http://localhost:${port}`)
+})// // console.log('Server started at http://localhost:' + port);
