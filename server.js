@@ -12,7 +12,7 @@ const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongod
 const app = express();
 
 // Define server port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // view engine setup
 app.set('view', express.static(path.join(__dirname, '/view')))
@@ -183,7 +183,7 @@ app.post('/request-submitted', (req,res) => {
     return value + 1;
   });
 
-  const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
+  const htmlTemplate = fs.readFileSync('./template/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
 
   invoice_pdf = invoiceTemplate({
