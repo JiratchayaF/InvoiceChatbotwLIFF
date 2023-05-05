@@ -7,15 +7,9 @@ const Handlebars = require('handlebars');
 const { route } = require('express/lib/application');
 const xmlbuilder = require('xmlbuilder');
 const { SignedXml, xmlCrypto } = require('xml-crypto');
-
-const crypto = require('crypto');
-const { Crypto } = require('node-webcrypto-ossl');
-const { PDFDocument } = require('pdf-lib')
 const pdf = require('html-pdf');
 const { type } = require('os');
-// const asn1js = require('asn1js')
-// const pkijs = require('pkijs')
-// const forge = require('node-forge');
+const forge = require('node-forge');
 
 
 // connect to DB
@@ -146,9 +140,9 @@ app.post('/request-submitted', (req,res) => {
           price: parseFloat(orderArray.productPrice).toFixed(2),          
           quantity: orderArray.productQuantity,
           shipFee: orderArray.shipFee,
-          discount: orderArray.productPrice,
-          linePoints: orderArray.productPrice,
-          lspDiscount: orderArray.productPrice,
+          discount: orderArray.discount,
+          linePoints: orderArray.linePoints,
+          lspDiscount: orderArray.lspDiscount,
           total: orderArray.productPrice * orderArray.productQuantity,
 
           totalFloat: parseFloat(orderArray.productPrice * orderArray.productQuantity).toFixed(2)
@@ -202,41 +196,139 @@ app.post('/request-submitted', (req,res) => {
       passphrase: '3500101376'
     }
 
+    var certificate = fs.readFileSync('./built/certificate.pem', 'utf-8')
+    var encodedCertificate = Buffer.from(certificate).toString('base64');
     sig.keyInfoProvider = {
       getKeyInfo() {
-        const certificate = fs.readFileSync('./built/certificate.pem', 'utf-8');
-        const encodedCertificate = Buffer.from(certificate).toString('base64');
-        return `<X509Data><X509Certificate>${certificate}</X509Certificate></X509Data>`;
-      },
+        return `<X509Data><X509Certificate>${encodedCertificate}</X509Certificate></X509Data>`;
+      }
     }
 
-    const root = xmlbuilder.create('order');
+    const date = new Date().toLocaleDateString()
+    const invNum = Math.random();
 
-    root.ele('customerData', finalOrder.customerData);
+    // Construct tax-invoice.xml
+
+    const doc = xmlbuilder.create(`TAXINV_${finalOrder.orderNumber}`)
+
+    doc.ele('InvoiceHeader')
+        .ele('Vendor')
+          .ele('Name')
+            .txt('Bringhome.theBacon')
+          .up() // end of Name
+          .ele('Address')
+            .txt('24/56 Bang Na-Trat Rd, Tambon Bang Sao Thong, Amphoe Bang Sao Thong, Chang Wat Samut Prakan 10540')
+          .up() // end of Address
+          .ele('Phone')
+            .att('type', 'telNumber')        
+            .txt('0987490837') 
+          .up() // end of Phone
+          .ele('TaxId')
+            .att('schemaID', 'TaxID')        
+            .txt('123456789012') 
+          .up() // end of taxId
+          .up() // end of Vendor
+
+          .ele('Customer')
+            .ele('CustomerInfo')
+              .ele('CustomerName')
+                .ele('FirstName')
+                  .txt(finalOrder.customerData.firstName)
+                .up() // end of FirstName
+                .ele('LastName')
+                  .txt(finalOrder.customerData.lastName)
+                .up() // end of LastName
+              .up() // end of CustomerName
+                .ele('Address')
+                  .txt(finalOrder.customerData.address)
+                .up()
+                .ele('Phone')
+                  .txt(finalOrder.customerData.mobileNum)
+                .up()
+                .ele('TaxId')
+                  .txt(finalOrder.customerData.taxID)
+                .up()
+              .up() // end of CustomerInfo
+
+            .ele('OrderHeaderInfo')
+              .ele('IssuedDateTime')
+                .txt(date)
+                .up() // end of IssuedDateTime
+              .ele('TaxInvoiceNumber')
+                .txt(invNum)
+                .up()
+              .ele('OrderNumber')
+                .txt(finalOrder.orderNumber)
+                .up()
+              .up() // end of OrderHeaderInfo
+            .up() // end of Customer
+        .up() // end of InvoiceHeader
     
-    const orderDatas = root.ele('orderData');
+    // Loop displaying orderData
+    let count = 1
+    const orderDatas = doc.ele('OrderDetails');
     for (const order of finalOrder.orderData) {
-      orderDatas.ele('order', order);
+      orderDatas.ele('ProductDetails')
+          .att('id', count++)
+          .ele('ProductID')
+            .txt(order.prodId)
+          .up() // end of ProductId
+          .ele('ProductName')
+            .txt(order.prodName)
+          .up() // end of ProductName
+          .ele('UnitPrice')
+            .txt(order.price)
+          .up() // end of UnitPrice
+          .ele('Quantity')
+            .txt(order.quantity)
+          .up() // end of Quantity
+          .ele('TotalPrice')
+            .txt(order.totalFloat)
+          .up() // end of TotalFloat
+        .up() // end of Products
     }
     
-    root.ele('orderNumber', finalOrder.orderNumber);
-    root.ele('subtotal', finalOrder.subtotal);
-    root.ele('discount', finalOrder.discount);
-    root.ele('shipFee', finalOrder.shipFee);
-    root.ele('vat', finalOrder.vat);
-    root.ele('gtotal', finalOrder.gtotal);
-    
-    const xml = root.end({ pretty: true });
+    doc.ele('EndofBillCalculation')
+        .ele('TotalBeforeVAT')
+          .txt(finalOrder.subtotal)
+        .up() // end of Subtotal
+        .ele('Discount')
+          .txt(finalOrder.discount)
+        .up() // end of Discount
+        .ele('ShipFee')
+          .txt(finalOrder.shipFee)
+        .up() // end of ShipFee
+        .ele('VAT')
+          .txt(finalOrder.vat)
+        .up() // end of VAT
+        .ele('GrandTotal')
+          .txt(finalOrder.gtotal)
+        .up() // end of SubTotal
+        
+    const xpath = `//*[local-name()="TAXINV_${orderNumber}"]`
+  
+    const xml = doc.end({ pretty: true })
     // console.log(xml);
 
-  sig.addReference('//*[local-name(.)="order"]', ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'])
-  sig.computeSignature(xml)
-  fs.writeFileSync('signedDocument.xml', signedDocument);
-  console.log(sig.getSignedXml())
+    sig.addReference(xpath, ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'])
+    sig.computeSignature(xml)
+    let signedXml = sig.getSignedXml()
 
-  const date = new Date().toLocaleDateString()
-  const imgPath = path.resolve(__dirname, './public/logo.png')
+    const objectXml = '<Object></Object>';
+    const cert = forge.pki.certificateFromPem(certificate);
+    const issuerName = cert.issuer.attributes.map(attr => `${attr.shortName}=${attr.value}`).join(', ');
+    const serialNumber = cert.serialNumber.toString();
 
+    // Create the qualifying properties
+    const qualifyingPropertiesXml = `<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#xmldsig-69b3d670-04e4-419f-8d45-938ea867f571"><xades:SignedProperties Id="xmldsig-69b3d670-04e4-419f-8d45-938ea867f571-signedprops"><xades:SignedSignatureProperties><xades:SigningTime>2023-05-06T12:34:56.789Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><DigestValue>${encodedCertificate}</DigestValue></xades:CertDigest><xades:IssuerSerial><X509IssuerName>${issuerName}</X509IssuerName><X509SerialNumber>${serialNumber}</X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties>`
+  
+    // Add the qualifying properties to the object
+    const objectWithQualifyingPropertiesXml = objectXml.replace('</Object>', qualifyingPropertiesXml + '</Object>');
+    
+    // Add the object to the signed XML document
+    const signedXmlWithObject = signedXml.replace('</Signature>', objectWithQualifyingPropertiesXml + '</Signature>');
+    console.log(signedXmlWithObject)    
+  
   Handlebars.registerHelper('addOne', function(value) {
     return value + 1;
   })
@@ -247,7 +339,7 @@ app.post('/request-submitted', (req,res) => {
   invoiceData = invoiceTemplate({
     finalOrder: finalOrder, 
     customerData: finalOrder.customerData,
-    // date: date,
+    date: date,
   })
 
 })
@@ -262,6 +354,7 @@ app.post('/request-submitted', (req,res) => {
 
 // Show download page after submit form
 app.get('/request-submitted', (req, res) => {
+
   // Check if the orderNumber has been filled
   CustomerData.findOneAndUpdate({orderNumber: orderNumber}, {invoiceDownloaded: true}, (err, result) => {
     if (err) throw err;
@@ -276,8 +369,8 @@ app.get('/request-submitted', (req, res) => {
 })
 
 // Redirect to '/download-file' after click download button
-app.post("/download-e-tax-inv", (req, res) => {
-  pdf.create(invoice_pdf).toStream((err, stream) => {
+app.post("/download-tax-inv", (req, res) => {
+  pdf.create(invoiceData).toStream((err, stream) => {
     if (err) {
       console.log(err);
       return res.sendStatus(500);
