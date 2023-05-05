@@ -6,15 +6,16 @@ const fs = require('fs');
 const Handlebars = require('handlebars');
 const { route } = require('express/lib/application');
 const xmlbuilder = require('xmlbuilder');
-const { SignedXml } = require('xml-crypto');
+const { SignedXml, xmlCrypto } = require('xml-crypto');
+
 const crypto = require('crypto');
 const { Crypto } = require('node-webcrypto-ossl');
 const { PDFDocument } = require('pdf-lib')
 const pdf = require('html-pdf');
 const { type } = require('os');
-const asn1js = require('asn1js')
-const pkijs = require('pkijs')
-const forge = require('node-forge');
+// const asn1js = require('asn1js')
+// const pkijs = require('pkijs')
+// const forge = require('node-forge');
 
 
 // connect to DB
@@ -189,8 +190,10 @@ app.post('/request-submitted', (req,res) => {
     console.log(finalOrder)
     console.log('Charot is preparing your data....')
 
-    // Add XadES signature to finalOrder object
+    // // Add XadES signature to finalOrder object
     const sig = new SignedXml()
+
+    // const signer = new xmlCrypto.SignatureAlgorithm()
 
     // Read the private key file and set it as the signing key
     const privateKey = fs.readFileSync('./built/private_key.pem', 'utf-8')
@@ -224,10 +227,11 @@ app.post('/request-submitted', (req,res) => {
     root.ele('gtotal', finalOrder.gtotal);
     
     const xml = root.end({ pretty: true });
-    console.log(xml);
+    // console.log(xml);
 
   sig.addReference('//*[local-name(.)="order"]', ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'])
   sig.computeSignature(xml)
+  fs.writeFileSync('signedDocument.xml', signedDocument);
   console.log(sig.getSignedXml())
 
   const date = new Date().toLocaleDateString()
