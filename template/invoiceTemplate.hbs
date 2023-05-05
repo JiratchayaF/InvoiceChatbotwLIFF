@@ -66,7 +66,6 @@
    
 	</style>
 </head>
-  <div id="order-list"></div>
   <body>
     <div class="containers">
     <div class="mx-auto sm">
@@ -108,12 +107,12 @@
       <table class="table user-details">
           <tr>
             <td scope="col"> 
-                <h3 class="name">{{customerData.firstName}}&nbsp;{{customerData.lastName}}</h3>
-                <span>{{customerData.address}}</span>
+                <h3 class="name">{{finalOrder.customerData.firstName}}&nbsp;{{finalOrder.customerData.lastName}}</h3>
+                <span>{{finalOrder.customerData.address}}</span>
                 <br>
-                <span>โทรศัพท์:&nbsp;{{customerData.mobileNum}}</span>
+                <span>โทรศัพท์:&nbsp;{{finalOrder.customerData.mobileNum}}</span>
                 <br>
-                <span>เลขประจำตัวผู้เสียภาษี:&nbsp;{{customerData.taxID}}</span>
+                <span>เลขประจำตัวผู้เสียภาษี:&nbsp;{{finalOrder.customerData.taxID}}</span>
             </td>
             {{!-- end of first cell --}}
 
@@ -227,11 +226,11 @@
       <br>
       วันที่: {{date}} 
       </span>
+      </div>
       <!-- end of invoice footer container -->
     </div>
     <!-- end of container wrapper -->
   </div>
   <!-- end of container -->
-</div>
 </body>
 </html>

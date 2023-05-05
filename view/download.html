@@ -16,7 +16,7 @@
               <img class="img-wrapper" src="logo.png">
               <h4 class="mt-3 mb-3">Your tax-invoice is on the go!</h4>
               <p class="mt-3 mb-3">Hooray! You can download your tax-invoice down below 👇🏻</p>
-              <form action="/download-e-tax-inv" method="post" class="form-inline">
+              <form action="/download-tax-inv" method="post" class="form-inline">
                 <!-- <button type="submit" class="btn btn-danger mx-auto" id = downloadINV>Download</button> -->
                 <button class="btn btn-danger" type="button" id="downloading" disabled>
                   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -55,7 +55,7 @@
     document.getElementById("downloadINV").style.left = "50%";
     document.getElementById("downloadINV").style.transform= "translate(-50%, -50%)";
     document.querySelector('[disabled]').disabled = false;
-  }, 8000);
+  }, 5000);
 </script> 
 </body>
 </html>

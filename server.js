@@ -3,20 +3,29 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const fs = require('fs');
-const pdf = require('html-pdf');
 const Handlebars = require('handlebars');
 const { route } = require('express/lib/application');
+const xmlbuilder = require('xmlbuilder');
+const { SignedXml } = require('xml-crypto');
+const crypto = require('crypto');
+const { Crypto } = require('node-webcrypto-ossl');
+const { PDFDocument } = require('pdf-lib')
+const pdf = require('html-pdf');
+const { type } = require('os');
+const asn1js = require('asn1js')
+const pkijs = require('pkijs')
+const forge = require('node-forge');
+
 
 // connect to DB
 const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
 const app = express();
 
 // Define server port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // view engine setup
 app.set('view', express.static(path.join(__dirname, '/view')))
-app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 // Middleware layer: parse JSON data
@@ -30,12 +39,14 @@ const CustomerDataSchema = {
   lastname: String,
   address: String,
   taxID: String,
-  mobileNum: String
+  mobileNum: String,
+  invoiceDownloaded: Boolean
 }
 // Create schema model to input to db
 const CustomerData = mongoose.model("Customerdatas", CustomerDataSchema)
 
 mongoose.set("strictQuery", false);
+
 // db connection
 mongoose.connect(url, { 
     useNewUrlParser: true, 
@@ -56,7 +67,9 @@ app.get('/', function(req, res) {
 });
 
 // define order number variable in global
+
 let finalOrder = {}
+let invoiceData 
 
 app.post('/request-submitted', (req,res) => {
   //post customers data in to mongodb by request the OrderNumber of submited form
@@ -173,26 +186,65 @@ app.post('/request-submitted', (req,res) => {
       vat: parseFloat(vat).toFixed(2),
       gtotal: parseFloat(grandTotal).toFixed(2)  
     }
-
+    console.log(finalOrder)
     console.log('Charot is preparing your data....')
+
+    // Add XadES signature to finalOrder object
+    const sig = new SignedXml()
+
+    // Read the private key file and set it as the signing key
+    const privateKey = fs.readFileSync('./built/private_key.pem', 'utf-8')
+    sig.signingKey = {
+      key: privateKey,
+      passphrase: '3500101376'
+    }
+
+    sig.keyInfoProvider = {
+      getKeyInfo() {
+        const certificate = fs.readFileSync('./built/certificate.pem', 'utf-8');
+        const encodedCertificate = Buffer.from(certificate).toString('base64');
+        return `<X509Data><X509Certificate>${certificate}</X509Certificate></X509Data>`;
+      },
+    }
+
+    const root = xmlbuilder.create('order');
+
+    root.ele('customerData', finalOrder.customerData);
     
+    const orderDatas = root.ele('orderData');
+    for (const order of finalOrder.orderData) {
+      orderDatas.ele('order', order);
+    }
+    
+    root.ele('orderNumber', finalOrder.orderNumber);
+    root.ele('subtotal', finalOrder.subtotal);
+    root.ele('discount', finalOrder.discount);
+    root.ele('shipFee', finalOrder.shipFee);
+    root.ele('vat', finalOrder.vat);
+    root.ele('gtotal', finalOrder.gtotal);
+    
+    const xml = root.end({ pretty: true });
+    console.log(xml);
+
+  sig.addReference('//*[local-name(.)="order"]', ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'])
+  sig.computeSignature(xml)
+  console.log(sig.getSignedXml())
+
   const date = new Date().toLocaleDateString()
   const imgPath = path.resolve(__dirname, './public/logo.png')
 
   Handlebars.registerHelper('addOne', function(value) {
     return value + 1;
-  });
+  })
 
-  const htmlTemplate = fs.readFileSync('./model/invoiceTemplate.hbs', 'utf8')
+  const htmlTemplate = fs.readFileSync('./template/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
 
-  invoice_pdf = invoiceTemplate({
+  invoiceData = invoiceTemplate({
     finalOrder: finalOrder, 
-    customerData: customerData,
-    date: date,
-    imgPath: imgPath
+    customerData: finalOrder.customerData,
+    // date: date,
   })
-  console.log('Charot has filled e-tax invoice and ready to be donwload!')
 
 })
 
@@ -206,8 +258,18 @@ app.post('/request-submitted', (req,res) => {
 
 // Show download page after submit form
 app.get('/request-submitted', (req, res) => {
-  res.sendFile(__dirname + '/view/download.html');
-});
+  // Check if the orderNumber has been filled
+  CustomerData.findOneAndUpdate({orderNumber: orderNumber}, {invoiceDownloaded: true}, (err, result) => {
+    if (err) throw err;
+
+    if (!result) {
+      res.status(400).send('No order found with the given order number.')
+    } else {
+            
+      res.sendFile(__dirname + '/view/download.html')
+    }
+  })
+})
 
 // Redirect to '/download-file' after click download button
 app.post("/download-e-tax-inv", (req, res) => {
@@ -225,6 +287,7 @@ app.post("/download-e-tax-inv", (req, res) => {
 
 // run app on local server
 // app.listen(port,'0.0.0.0')
+
 app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`)
-})// // console.log('Server started at http://localhost:' + port);
+})
