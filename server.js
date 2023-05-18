@@ -4,16 +4,16 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const Handlebars = require('handlebars');
-const { route } = require('express/lib/application');
 const xmlbuilder = require('xmlbuilder');
-const { SignedXml, xmlCrypto } = require('xml-crypto');
+const { SignedXml } = require('xml-crypto');
 const pdf = require('html-pdf');
-const { type } = require('os');
-const forge = require('node-forge');
-
+const forge = require('node-forge')
+const xmlFormatter = require('xml-formatter');
+require('dotenv').config()
 
 // connect to DB
-const url = 'mongodb+srv://fuengjiratchaya:mongotest123@testmongo.wxnjfzh.mongodb.net/InvoiceData'
+const password = process.env.MONGODB_PASSWORD
+const url = `mongodb+srv://fuengjiratchaya:${password}@testmongo.wxnjfzh.mongodb.net/InvoiceData`;
 const app = express();
 
 // Define server port
@@ -65,6 +65,7 @@ app.get('/', function(req, res) {
 
 let finalOrder = {}
 let invoiceData 
+let formattedXml
 
 app.post('/request-submitted', (req,res) => {
   //post customers data in to mongodb by request the OrderNumber of submited form
@@ -86,7 +87,8 @@ app.post('/request-submitted', (req,res) => {
       lastname: String,
       address: String,
       taxID: String,
-      mobileNum: String
+      mobileNum: String,
+      invoiceDownloaded: Boolean
     });
 
     // Define collection transactions model
@@ -126,6 +128,7 @@ app.post('/request-submitted', (req,res) => {
         address: dataMerged[0].address,
         taxID: dataMerged[0].taxID,
         mobileNum: dataMerged[0].mobileNum,
+        invoiceDownloaded: false
         }
 
       let orderData = []
@@ -164,7 +167,6 @@ app.post('/request-submitted', (req,res) => {
         shipFee += orderData[j].shipFee
       }
   
-
     sumDiscount = discount+linePoints+lspDiscount
     totalBeforeTax = (subTotal + shipFee) - sumDiscount // totalBeforeTax => total price of every product plus shipping fee
     vat = (totalBeforeTax * 7) / 100   // VAT 7% that was already include in product price
@@ -184,32 +186,12 @@ app.post('/request-submitted', (req,res) => {
     console.log(finalOrder)
     console.log('Charot is preparing your data....')
 
-    // // Add XadES signature to finalOrder object
-    const sig = new SignedXml()
-
-    // const signer = new xmlCrypto.SignatureAlgorithm()
-
-    // Read the private key file and set it as the signing key
-    const privateKey = fs.readFileSync('./built/private_key.pem', 'utf-8')
-    sig.signingKey = {
-      key: privateKey,
-      passphrase: '3500101376'
-    }
-
-    var certificate = fs.readFileSync('./built/certificate.pem', 'utf-8')
-    var encodedCertificate = Buffer.from(certificate).toString('base64');
-    sig.keyInfoProvider = {
-      getKeyInfo() {
-        return `<X509Data><X509Certificate>${encodedCertificate}</X509Certificate></X509Data>`;
-      }
-    }
-
-    const date = new Date().toLocaleDateString()
-    const invNum = Math.random();
-
     // Construct tax-invoice.xml
 
-    const doc = xmlbuilder.create(`TAXINV_${finalOrder.orderNumber}`)
+    doc = xmlbuilder.create(`TAXINV_${finalOrder.orderNumber}_copy`)
+    const dummyDate = new Date()
+    const signedDate = dummyDate.toISOString()
+    const invNum = Math.random();
 
     doc.ele('InvoiceHeader')
         .ele('Vendor')
@@ -252,7 +234,7 @@ app.post('/request-submitted', (req,res) => {
 
             .ele('OrderHeaderInfo')
               .ele('IssuedDateTime')
-                .txt(date)
+                .txt(signedDate)
                 .up() // end of IssuedDateTime
               .ele('TaxInvoiceNumber')
                 .txt(invNum)
@@ -308,8 +290,27 @@ app.post('/request-submitted', (req,res) => {
     const xpath = `//*[local-name()="TAXINV_${orderNumber}"]`
   
     const xml = doc.end({ pretty: true })
-    // console.log(xml);
+  
+    // // Add XadES signature to finalOrder object
+    const sig = new SignedXml()
 
+    // Read the private key file and set it as the signing key
+    const privateKey = fs.readFileSync('./built/private_key.pem', 'utf-8')
+    sig.signingKey = {
+      key: privateKey,
+      passphrase: process.env.PRIVATE_KEY_PASSPHRASE
+    }
+
+    var certificate = fs.readFileSync('./built/certificate.pem', 'utf-8')
+    var encodedCertificate = Buffer.from(certificate).toString('base64');
+    sig.keyInfoProvider = {
+      getKeyInfo() {
+        return `<X509Data><X509Certificate>${encodedCertificate}</X509Certificate></X509Data>`;
+      }
+    }
+
+    const date = new Date().toLocaleDateString()
+    
     sig.addReference(xpath, ['http://www.w3.org/2000/09/xmldsig#enveloped-signature'])
     sig.computeSignature(xml)
     let signedXml = sig.getSignedXml()
@@ -320,20 +321,42 @@ app.post('/request-submitted', (req,res) => {
     const serialNumber = cert.serialNumber.toString();
 
     // Create the qualifying properties
-    const qualifyingPropertiesXml = `<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#xmldsig-69b3d670-04e4-419f-8d45-938ea867f571"><xades:SignedProperties Id="xmldsig-69b3d670-04e4-419f-8d45-938ea867f571-signedprops"><xades:SignedSignatureProperties><xades:SigningTime>2023-05-06T12:34:56.789Z</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><DigestValue>${encodedCertificate}</DigestValue></xades:CertDigest><xades:IssuerSerial><X509IssuerName>${issuerName}</X509IssuerName><X509SerialNumber>${serialNumber}</X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties>`
+    const qualifyingPropertiesXml = `<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#xmldsig-69b3d670-04e4-419f-8d45-938ea867f571"><xades:SignedProperties Id="xmldsig-69b3d670-04e4-419f-8d45-938ea867f571-signedprops"><xades:SignedSignatureProperties><xades:SigningTime>${signedDate}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><DigestValue>${encodedCertificate}</DigestValue></xades:CertDigest><xades:IssuerSerial><X509IssuerName>${issuerName}</X509IssuerName><X509SerialNumber>${serialNumber}</X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties>`
   
     // Add the qualifying properties to the object
     const objectWithQualifyingPropertiesXml = objectXml.replace('</Object>', qualifyingPropertiesXml + '</Object>');
     
     // Add the object to the signed XML document
     const signedXmlWithObject = signedXml.replace('</Signature>', objectWithQualifyingPropertiesXml + '</Signature>');
-    console.log(signedXmlWithObject)    
-  
-  Handlebars.registerHelper('addOne', function(value) {
+    console.log(signedXmlWithObject) 
+
+    formattedXml = xmlFormatter(signedXmlWithObject, {
+      collapseContent: true, // Remove line breaks within text content
+      indentation: '  ' // Specify the desired indentation (e.g., two spaces)
+    })
+    console.log(formattedXml)
+
+    const baseDir = './taxinv_copy'; // Replace with the desired folder path
+
+    const currentDate = new Date().toISOString().slice(0, 10);
+    const folderPath = path.join(baseDir, currentDate)
+
+    // Create the folder if it doesn't exist
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+    }    
+
+    // Create the file path by appending the file name to the folder path
+    const filePath = path.join(folderPath, `TAXINV_${finalOrder.orderNumber}_copy.xml`);
+
+    // Write the XML content to the file
+    fs.writeFileSync(filePath, formattedXml, 'utf8');  
+
+    Handlebars.registerHelper('addOne', function(value) {
     return value + 1;
   })
 
-  const htmlTemplate = fs.readFileSync('./template/invoiceTemplate.hbs', 'utf8')
+  const htmlTemplate = fs.readFileSync('./public/invoiceTemplate.hbs', 'utf8')
   const invoiceTemplate = Handlebars.compile(htmlTemplate)
 
   invoiceData = invoiceTemplate({
@@ -355,6 +378,7 @@ app.post('/request-submitted', (req,res) => {
 // Show download page after submit form
 app.get('/request-submitted', (req, res) => {
 
+  // // แก้บัคพรุ่งนี้
   // Check if the orderNumber has been filled
   CustomerData.findOneAndUpdate({orderNumber: orderNumber}, {invoiceDownloaded: true}, (err, result) => {
     if (err) throw err;
@@ -380,6 +404,25 @@ app.post("/download-tax-inv", (req, res) => {
     stream.pipe(res);
   })
   console.log(`TAXINV_${finalOrder.orderNumber} is downloaded`)
+
+  // // Define the base directory where the daily folders will be created
+  // const baseDir = './taxinv_copy'
+
+  // // Create a folder name based on the current date (e.g., '2023-05-18')
+  // const currentDate = new Date().toISOString().slice(0, 10);
+  // const folderName = path.join(baseDir, currentDate);
+
+  // // Check if the folder already exists
+  // if (!fs.existsSync(folderName)) {
+  //   // Create the folder if it doesn't exist
+  //   fs.mkdirSync(folderName, { recursive: true });
+  // }
+
+  // // Create the file path by appending the file name to the folder path
+  // const filePath = path.join(folderName, `TAXINV_${finalOrder.orderNumber}_copy.xml`);
+
+  // // Write the XML content to the file
+  // fs.writeFileSync(filePath, signedXml, 'utf8');
 })
 
 // run app on local server
